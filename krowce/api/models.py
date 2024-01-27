@@ -5,7 +5,7 @@ from django.db import models
 
 class User(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     created_at = models.DateTimeField('date created', default=datetime.datetime.utcnow)
     died_at = models.DateTimeField('date last died', null=True, blank=True)
@@ -28,7 +28,7 @@ class Sentence(models.Model):
 
 class Team(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -36,7 +36,7 @@ class Team(models.Model):
 
 class Session(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     users = models.ManyToManyField('User')
 

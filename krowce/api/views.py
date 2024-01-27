@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.models import Group as AuthGroup, User as AuthUser
 from rest_framework import permissions, viewsets
+from rest_framework.response import Response
 from .serializers import *
 from .models import *
 
@@ -37,9 +38,15 @@ class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
 
+
 class SessionViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows sessions to be viewed or edited.
     """
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = SessionSerializer(queryset, many=True)
+        return Response({"sessions": serializer.data})
