@@ -55,15 +55,9 @@ class SessionViewSet(viewsets.ModelViewSet):
 
 @require_POST
 def login(request: HttpRequest) -> HttpResponse:
-    # Check if the request contains JSON data
-    if request.content_type != 'application/json':
-        return JsonResponse({'error': 'Invalid content type'}, status=400)
-
-    # Parse the JSON data
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    data, error = parse_json_request(request)
+    if error:
+        return error
 
     username = data.get('username')
     password = data.get('password')
@@ -74,21 +68,15 @@ def login(request: HttpRequest) -> HttpResponse:
 
     user = User.objects.get(name=username)
     if user and user.password == password:
-        return JsonResponse({}, status=200)
+        return JsonResponse({})
     return JsonResponse({'error': 'Wrong credentials'}, status=401)
 
 
 @require_POST
 def signup(request: HttpRequest) -> HttpResponse:
-    # Check if the request contains JSON data
-    if request.content_type != 'application/json':
-        return JsonResponse({'error': 'Invalid content type'}, status=400)
-
-    # Parse the JSON data
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    data, error = parse_json_request(request)
+    if error:
+        return error
 
     username = data.get('username')
     password = data.get('password')
@@ -100,7 +88,7 @@ def signup(request: HttpRequest) -> HttpResponse:
                 'Request lacks required fields: username, password, teamname'
             },
             status=400)
-    team = get_object_or_404(Team, name=teamname)
+    team: Team = get_object_or_404(Team, name=teamname)
     if not team:
         return JsonResponse(
             {'error': 'Team with specified name does not exist'}, status=400)
@@ -111,4 +99,33 @@ def signup(request: HttpRequest) -> HttpResponse:
     user.save()
     if created:
         return JsonResponse({}, status=201)
-    return JsonResponse({}, status=200)
+    return JsonResponse({})
+
+
+@require_POST
+def join_session(request: HttpRequest) -> HttpResponse:
+    data, error = parse_json_request(request)
+    if error:
+        return error
+
+    username = data.get('username')
+    sessionname = data.get('session')
+    if not username or not sessionname:
+        return JsonResponse(
+            {'error': 'Request lacks required fields: username, session'},
+            status=400)
+    session: Session = get_object_or_404(Session, name=sessionname)
+    user: user = get_object_or_404(User, name=username)
+    if not user in session.users.all():
+        session.users.add(user)
+    return JsonResponse({})
+
+
+def parse_json_request(request: HttpRequest) -> tuple[dict, dict]:
+    if request.content_type != 'application/json':
+        return None, JsonResponse({'error': 'Invalid content type'}, status=400)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return None, JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    return data, None
