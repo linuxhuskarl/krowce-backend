@@ -3,7 +3,13 @@ from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
-    team = serializers.StringRelatedField()
+    team = serializers.SlugRelatedField(slug_field='name',
+                                        queryset=Team.objects.all())
+    scores = serializers.SlugRelatedField(many=True,
+                                          source='score_set',
+                                          slug_field='distance',
+                                          read_only=True)
+
     class Meta:
         model = User
         fields = ['id', 'name', 'team', 'created_at', 'died_at', 'scores']
