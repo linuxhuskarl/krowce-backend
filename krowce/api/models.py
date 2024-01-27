@@ -49,10 +49,22 @@ class Item(models.Model):
     key = models.CharField('key', max_length=255)
     x = models.FloatField('distance <0, >')
     y = models.FloatField('height <-4, 4>')
+    active = models.BooleanField(default=True)
 
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     session = models.ForeignKey('Session', on_delete=models.CASCADE)
     sentence = models.ForeignKey('Sentence', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.session.name} - {self.user.name} - {self.key}"
+        return f"{self.session.name} - {self.user.name} - {self.key} - {self.active}"
+
+
+class Score(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    distance = models.FloatField()
+
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    session = models.ForeignKey('Session', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.distance} - {self.user.name}"

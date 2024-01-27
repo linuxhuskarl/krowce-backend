@@ -8,6 +8,7 @@ router.register(r'users', views.UserViewSet)
 router.register(r'teams', views.TeamViewSet)
 router.register(r'sessions', views.SessionViewSet)
 router.register(r'items', views.ItemViewSet)
+router.register(r'scores', views.ScoreViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

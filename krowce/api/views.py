@@ -24,6 +24,14 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
 
 
+class ScoreViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows scores to be viewed or edited.
+    """
+    queryset = Score.objects.all()
+    serializer_class = ScoreSerializer
+
+
 class TeamViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows teams to be viewed or edited.
