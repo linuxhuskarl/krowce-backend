@@ -1,19 +1,11 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
-from django.contrib.auth.models import Group as AuthGroup, User as AuthUser
-from rest_framework import permissions, viewsets
+import json
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.views.decorators.http import require_POST
+from rest_framework import viewsets
 from rest_framework.response import Response
 from .serializers import *
 from .models import *
 
-
-
-# Create your views here.
-def echo_response(request: HttpRequest) -> HttpResponse:
-    # get the message from the request and return it as is
-    message = request.GET.get('msg', 'No message provided.')
-
-    return HttpResponse(f"echo: {message}")
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -50,3 +42,27 @@ class SessionViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         serializer = SessionSerializer(queryset, many=True)
         return Response({"sessions": serializer.data})
+
+@require_POST
+def login(request: HttpRequest) -> HttpResponse:
+    # Check if the request contains JSON data
+    if request.content_type != 'application/json':
+        return JsonResponse({'error': 'Invalid content type'}, status=400)
+
+    # Parse the JSON data
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+
+    username = data.get('username')
+    password = data.get('password')
+    if not username or not password:
+        return JsonResponse(
+            {'error': 'Request lacks required fields: username, password'},
+            status=400)
+
+    user = User.objects.get(name=username)
+    if user and user.password == password:
+        return JsonResponse({}, status=200)
+    return JsonResponse({'error': 'Wrong credentials'}, status=401)
