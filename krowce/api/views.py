@@ -129,7 +129,7 @@ def add_item_sentence_and_score(request: HttpRequest) -> HttpResponse:
 
     username = data.get('user')
     sessionname = data.get('session', 'default')
-    text = data.get('text')
+    text = data.get('sentence')
     item_key = data.get('key')
     item_x = data.get('x', 0)
     item_y = data.get('y', 0)

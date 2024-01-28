@@ -17,9 +17,10 @@ class UserSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(slug_field='name', queryset=User.objects.all())
     sentence = serializers.SlugRelatedField(read_only=True, slug_field='text')
+    disables = serializers.PrimaryKeyRelatedField(read_only=True, allow_null=True, required=False)
     class Meta:
         model = Item
-        fields = ['id', 'key', 'x', 'y', 'user', 'sentence']
+        fields = ['id', 'key', 'x', 'y', 'disables', 'user', 'sentence']
 
 
 class ScoreSerializer(serializers.ModelSerializer):

@@ -49,7 +49,8 @@ class Item(models.Model):
     key = models.CharField('key', max_length=255)
     x = models.FloatField('distance <0, >')
     y = models.FloatField('height <-4, 4>')
-    active = models.BooleanField(default=True)
+
+    disables = models.ForeignKey('Item', on_delete=models.SET_NULL, null=True, blank=True)
 
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     session = models.ForeignKey('Session', on_delete=models.CASCADE)
