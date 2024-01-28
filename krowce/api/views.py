@@ -140,8 +140,15 @@ def add_item_sentence_and_score(request: HttpRequest) -> HttpResponse:
             {'error': 'Request lacks required fields: username, text, key'},
             status=400)
 
-    user: User = get_object_or_404(User, name=username)
     session: Session = get_object_or_404(Session, name=sessionname)
+
+    try:
+        user = User.objects.get(name=username)
+    except User.DoesNotExist:
+        user = User(name=username)
+        user.team = Team.objects.get(name='Krowy')
+        user.save()
+        session.users.add(user)
 
     sentence = Sentence()
     sentence.text = text
