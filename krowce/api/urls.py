@@ -17,6 +17,7 @@ urlpatterns = [
     path('login/', views.login),
     path('signup/', views.signup),
     path('join-session/', views.join_session),
+    path('finish-combo/', views.add_item_sentence_and_score),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 

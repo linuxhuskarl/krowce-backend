@@ -109,7 +109,7 @@ def join_session(request: HttpRequest) -> HttpResponse:
         return error
 
     username = data.get('username')
-    sessionname = data.get('session')
+    sessionname = data.get('session', 'default')
     if not username or not sessionname:
         return JsonResponse(
             {'error': 'Request lacks required fields: username, session'},
@@ -118,6 +118,51 @@ def join_session(request: HttpRequest) -> HttpResponse:
     user: user = get_object_or_404(User, name=username)
     if not user in session.users.all():
         session.users.add(user)
+    return JsonResponse({})
+
+
+@require_POST
+def add_item_sentence_and_score(request: HttpRequest) -> HttpResponse:
+    data, error = parse_json_request(request)
+    if error:
+        return error
+
+    username = data.get('user')
+    sessionname = data.get('session', 'default')
+    text = data.get('text')
+    item_key = data.get('key')
+    item_x = data.get('x', 0)
+    item_y = data.get('y', 0)
+    dist = data.get('score', 0)
+
+    if not username or not text or not item_key:
+        return JsonResponse(
+            {'error': 'Request lacks required fields: username, text, key'},
+            status=400)
+
+    user: User = get_object_or_404(User, name=username)
+    session: Session = get_object_or_404(Session, name=sessionname)
+
+    sentence = Sentence()
+    sentence.text = text
+    sentence.user = user
+    sentence.save()
+
+    item = Item()
+    item.key = item_key
+    item.x = item_x
+    item.y = item_y
+    item.user = user
+    item.session = session
+    item.sentence = sentence
+    item.save()
+
+    score = Score()
+    score.user = user
+    score.distance = dist
+    score.session = session
+    score.save()
+
     return JsonResponse({})
 
 
