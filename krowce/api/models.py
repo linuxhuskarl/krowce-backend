@@ -50,14 +50,15 @@ class Item(models.Model):
     x = models.FloatField('distance <0, >')
     y = models.FloatField('height <-4, 4>')
 
-    disables = models.ForeignKey('Item', on_delete=models.SET_NULL, null=True, blank=True)
+    disables = models.CharField(max_length=255, null=True, blank=True)
+    lane = models.IntegerField(null=True, blank=True)
 
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     session = models.ForeignKey('Session', on_delete=models.CASCADE)
     sentence = models.ForeignKey('Sentence', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.session.name} - {self.user.name} - {self.key} - {self.active}"
+        return f"{self.session.name} - {self.user.name} - {self.key}"
 
 
 class Score(models.Model):

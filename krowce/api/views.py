@@ -134,6 +134,8 @@ def add_item_sentence_and_score(request: HttpRequest) -> HttpResponse:
     item_x = data.get('x', 0)
     item_y = data.get('y', 0)
     dist = data.get('score', 0)
+    disables_id = data.get('disables')
+    lane_id = data.get('lane')
 
     if not username or not text or not item_key:
         return JsonResponse(
@@ -162,6 +164,8 @@ def add_item_sentence_and_score(request: HttpRequest) -> HttpResponse:
     item.user = user
     item.session = session
     item.sentence = sentence
+    item.disables = disables_id
+    item.lane = lane_id
     item.save()
 
     score = Score()
